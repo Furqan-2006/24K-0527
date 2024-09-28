@@ -31,6 +31,7 @@ int main()
     {
         printf("\nSorry! You are not eligible.");
         printf("\nEither age or credit score do not met the requirement for loan application.");
+        printf("\nAge must be greater than 19 and credit score must be greater than 649.");
     }
 
     return 0;

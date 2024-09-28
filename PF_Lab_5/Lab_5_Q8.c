@@ -15,7 +15,7 @@ int main()
         }
         num = num >> 1;
     }
-    printf("Number of 1s in the binary representation is: %d\n", count);
+    printf("Number of 1s in the binary representation is: %d\n", i);
 
     return 0;
 }
