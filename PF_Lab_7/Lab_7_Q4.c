@@ -5,44 +5,62 @@ int main()
     int size;
     printf("Enter the size of the array: ");
     scanf("%d", &size);
-
     int arr[size];
+    printf("\nEnter numbers in range [0 , %d) \n", size);
 
     for (int i = 0; i < size; i++)
     {
-        printf("Enter element %d: ", i + 1);
+        printf("Enter integer_%d: ", i + 1);
         scanf("%d", &arr[i]);
-        if (arr[i] < 0 || arr[i] >= size)
+        if (arr[i] < 0 || arr[i] > (size - 1))
         {
-            printf("Invalid input! %d is out of range [0, %d)\n", arr[i], size);
-            return 1;  
+            printf("Invalid Input! The input must be in range.");
+            return 0;
         }
     }
 
-    int foundDuplicate = 0;
-    printf("Numbers occurring more than once: ");
+    for (int i = 0; i < size - 1; i++)
+    {
+        for (int j = 0; j < size - i - 1; j++)
+        {
+            if (arr[j] > arr[j + 1])
+            {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
 
+    int lastPrinted = -1;
+    int repeated[size];
     for (int i = 0; i < size; i++)
     {
-        int index = arr[i];
-        if (arr[index] >= 0)
-        {
-            arr[index] = -arr[index];
-        }
-        else
-        {
-            printf("%d ", index);
-            foundDuplicate = 1;
-            arr[index] = -10000;
-        }
+        repeated[i] = 0;
     }
 
-    if (!foundDuplicate)
+    for (int i = 1; i < size; i++)
     {
-        printf("None");
+        if (arr[i] == arr[i - 1] && arr[i] != lastPrinted)
+        {
+            repeated[i] = arr[i];
+            lastPrinted = arr[i];
+        }
     }
-
-    printf("\n");
+    int comma = size;
+    for (int i = 0; i < size; i++)
+    {
+        if (repeated[i] != 0)
+        {
+            printf("%d", repeated[i]);
+            comma--;
+            if (i < comma )
+            {
+                printf(", ");
+            }
+        }
+    }
+    printf("are the repeated numbers.");
 
     return 0;
 }
