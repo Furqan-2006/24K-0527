@@ -47,20 +47,15 @@ int main()
             lastPrinted = arr[i];
         }
     }
-    int comma = size;
+
     for (int i = 0; i < size; i++)
     {
         if (repeated[i] != 0)
         {
-            printf("%d", repeated[i]);
-            comma--;
-            if (i < comma )
-            {
-                printf(", ");
-            }
+            printf("'%d' ", repeated[i]);
         }
     }
-    printf("are the repeated numbers.");
+    printf(" are the repeated numbers.");
 
     return 0;
 }
