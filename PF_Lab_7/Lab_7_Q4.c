@@ -19,41 +19,28 @@ int main()
         }
     }
 
-    for (int i = 0; i < size - 1; i++)
+    int max = arr[0];
+    for (int i = 1; i < size; i++)
     {
-        for (int j = 0; j < size - i - 1; j++)
-        {
-            if (arr[j] > arr[j + 1])
-            {
-                int temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
-            }
-        }
+        if (max < arr[i])
+            max = arr[i];
     }
 
-    int lastPrinted = -1;
-    int repeated[size];
-    for (int i = 0; i < size; i++)
+    int repeated[max + 1];
+    for (int i = 0; i <= max; i++)
     {
         repeated[i] = 0;
     }
 
-    for (int i = 1; i < size; i++)
-    {
-        if (arr[i] == arr[i - 1] && arr[i] != lastPrinted)
-        {
-            repeated[i] = arr[i];
-            lastPrinted = arr[i];
-        }
-    }
-
     for (int i = 0; i < size; i++)
     {
-        if (repeated[i] != 0)
-        {
-            printf("'%d' ", repeated[i]);
-        }
+        repeated[arr[i]]++;
+    }
+
+    for (int i = 0; i <= max; i++)
+    {
+        if (repeated[i] > 1)
+            printf("'%d' ", i);
     }
     printf(" are the repeated numbers.");
 
