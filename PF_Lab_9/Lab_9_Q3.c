@@ -14,7 +14,7 @@ int main()
     printf("Enter an integer: ");
     scanf("%d", &n);
     strncat(des, src, n);
-    printf("The new concatenated string is %s", des);
+    printf("The new concatenated string is '%s'", des);
 
     return 0;
 }
