@@ -27,7 +27,7 @@ struct bat
 void createPlayer();
 void readPlayers();
 void updatePlayers();
-// void deletePlayer();
+void deletePlayer();
 
 int main()
 {
@@ -53,7 +53,7 @@ int main()
         updatePlayers();
         break;
     case 4:
-        // deletePlayer();
+        deletePlayer();
         break;
 
     default:
@@ -80,7 +80,7 @@ void createPlayer()
 
     struct bat newPlayer;
     printf("Enter player name: ");
-    scanf("%s", newPlayer.ply2.ply.name);
+    scanf(" %19[^\n]", newPlayer.ply2.ply.name);
     printf("Enter team name: ");
     scanf("%s", newPlayer.ply2.ply.team);
     printf("Enter bowler type (seemer/pacer/spinner): ");
@@ -110,6 +110,7 @@ void readPlayers()
     fseek(fp, 56, SEEK_SET);
     struct bat newPlayer;
     while (!feof(fp))
+
     {
         if (fscanf(fp, "%19[^,],%19[^,],%9[^,],%4[^,],%9[^,],%7[^\n]\n",
                    newPlayer.ply2.ply.name, newPlayer.ply2.ply.team, newPlayer.ply2.type,
@@ -130,4 +131,141 @@ void readPlayers()
         }
     }
     fclose(fp);
+}
+
+void updatePlayers()
+{
+    FILE *fp = fopen("players.csv", "r");
+    if (fp == NULL)
+    {
+        perror("Can not open file! ");
+        return;
+    }
+    struct bat players[100];
+    int count = 0;
+    fseek(fp, 56, SEEK_SET);
+    while (!feof(fp))
+    {
+        if (fscanf(fp, "%19[^,],%19[^,],%9[^,],%4[^,],%9[^,],%7[^\n]\n",
+                   players[count].ply2.ply.name, players[count].ply2.ply.team, players[count].ply2.type,
+                   players[count].ply2.arm, players[count].btype, players[count].handed) == 6)
+        {
+            // printf("reading..");
+            count++;
+        }
+    }
+    fclose(fp);
+    for (int i = 0; i < count; i++)
+    {
+        printf("Player Found: %s, %s, %s, %s, %s, %s\n", players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
+               players[i].ply2.arm, players[i].btype, players[i].handed);
+    }
+
+    char Pname[20];
+    printf("Enter the name of the player to update: ");
+    scanf(" %19[^\n]", Pname);
+    int found = 0;
+    for (int i = 0; i < count; i++)
+    {
+        if (strcmp(players[i].ply2.ply.name, Pname) == 0)
+        {
+            found = 1;
+            printf("Player Found: %s, %s, %s, %s, %s, %s\n", players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
+                   players[i].ply2.arm, players[i].btype, players[i].handed);
+
+            printf("Enter new details of the Player:\n");
+            printf("Enter new team: ");
+            scanf("%s", players[i].ply2.ply.team);
+            printf("Enter new bowler type (seemer/pacer/spinner or N/A): ");
+            scanf("%s", players[i].ply2.type);
+            printf("Enter new bowler arm (left/right or N/A): ");
+            scanf("%s", players[i].ply2.arm);
+            printf("Enter new batsman type (top/middle/lower or N/A): ");
+            scanf("%s", players[i].btype);
+            printf("Enter new batsman handedness (lefty/righty or N/A): ");
+            scanf("%s", players[i].handed);
+            break;
+        }
+    }
+    if (!found)
+    {
+        printf("No such player with name '%s'. ", Pname);
+        return;
+    }
+    fp = fopen("players.csv", "w");
+    if (fp == NULL)
+    {
+        perror("Cannot open File! ");
+        return;
+    }
+    fseek(fp, 0, SEEK_END);
+    if (ftell(fp) == 0)
+    {
+        fprintf(fp, "Name,Team,BowlerType,BowlerArm,BatsmanType,BatsmanHand\n");
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        fprintf(fp, "%s,%s,%s,%s,%s,%s\n",
+                players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
+                players[i].ply2.arm, players[i].btype, players[i].handed);
+    }
+    fclose(fp);
+    printf("All Changes Saved!");
+}
+
+void deletePlayer()
+{
+    FILE *fp = fopen("players.csv", "r");
+    if (fp == NULL)
+    {
+        perror("Can not open file! ");
+        return;
+    }
+    struct bat players[100];
+    int count = 0;
+    while (!feof(fp))
+    {
+        if (fscanf(fp, "%19[^,],%19[^,],%9[^,],%4[^,],%9[^,],%7[^\n]\n",
+                   players[count].ply2.ply.name, players[count].ply2.ply.team, players[count].ply2.type,
+                   players[count].ply2.arm, players[count].btype, players[count].handed) == 6)
+        {
+            count++;
+        }
+    }
+    fclose(fp);
+
+    char Pname[20];
+    printf("Enter the name of the player to delete: ");
+    scanf(" %19[^\n]", Pname);
+    int found = 0;
+    for (int i = 0; i < count; i++)
+    {
+        FILE *fp = fopen("tempplayers.csv", "w+");
+        if (fp == NULL)
+        {
+            perror("Can not open file! ");
+            return;
+        }
+        fseek(fp, 0, SEEK_SET);
+        if (ftell(fp) == 0)
+        {
+            fprintf(fp, "Name,Team,BowlerType,BowlerArm,BatsmanType,BatsmanHand\n");
+        }
+
+        if (strcmp(players[i].ply2.ply.name, Pname) == 0)
+        {
+            found = 1;
+            continue;
+        }
+        else
+        {
+            fprintf(fp, "%s,%s,%s,%s,%s,%s\n",
+                    players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
+                    players[i].ply2.arm, players[i].btype, players[i].handed);
+        }
+        fclose(fp);
+    }
+    remove("players.csv");
+    rename("tempplayers.csv", "players.csv");
 }
