@@ -29,6 +29,7 @@ void readPlayers();
 void updatePlayers();
 void deletePlayer();
 
+// The main function presents a list of options to user and contains function calls.
 int main()
 {
     struct bat Batter[5];
@@ -63,21 +64,23 @@ int main()
 
     return 0;
 }
-
+// This function reads data for a new player and stores it in a csv file.
 void createPlayer()
 {
+    // opening file
     FILE *fp = fopen("players.csv", "a+");
     if (fp == NULL)
     {
         perror("File opening failed!");
     }
-
+    // setting file pointer(fp) to to end and then checking if the file is empty or not.
     fseek(fp, 0, SEEK_END);
     if (ftell(fp) == 0)
     {
+        // If file is empty the following header of the file gets printed.
         fprintf(fp, "Name,Team,BowlerType,BowlerArm,BatsmanType,BatsmanHand\n");
     }
-
+    // Takes input from user in the bat structure.
     struct bat newPlayer;
     printf("Enter player name: ");
     scanf(" %19[^\n]", newPlayer.ply2.ply.name);
@@ -91,24 +94,27 @@ void createPlayer()
     scanf("%s", newPlayer.btype);
     printf("Enter batsman handedness (lefty/righty): ");
     scanf("%s", newPlayer.handed);
-
+    // Writing/appending the structure to file
     fprintf(fp, "%s,%s,%s,%s,%s,%s\n", newPlayer.ply2.ply.name, newPlayer.ply2.ply.team, newPlayer.ply2.type, newPlayer.ply2.arm, newPlayer.btype, newPlayer.handed);
     fclose(fp);
 }
 
 void readPlayers()
 {
+    // opening file
     FILE *fp = fopen("players.csv", "r");
     if (fp == NULL)
     {
         perror("Cannot Read File!!");
         return;
     }
-
+    // Printing header in the console
     printf("Name, Team, Bowler Type, Arm, Batsman Type, Handed\n");
     printf("---------------------------------------------------\n");
+    // setting the file pointer to skip the header line
     fseek(fp, 56, SEEK_SET);
     struct bat newPlayer;
+    // reading the file lines and printing in console
     while (!feof(fp))
 
     {
@@ -116,9 +122,9 @@ void readPlayers()
                    newPlayer.ply2.ply.name, newPlayer.ply2.ply.team, newPlayer.ply2.type,
                    newPlayer.ply2.arm, newPlayer.btype, newPlayer.handed) == 6)
         {
-            printf("%s, %s, %s, %s, %s, %s\n",
+            printf(" %s, %s, %s, %s, %s, %s\n",
                    newPlayer.ply2.ply.name, newPlayer.ply2.ply.team,
-                   strcmp(newPlayer.ply2.type, "N/A") == 0 ? "-" : newPlayer.ply2.type,
+                   strcmp(newPlayer.ply2.type, "N/A") == 0 ? "-" : newPlayer.ply2.type, // replacing N/A by dash(-) .
                    strcmp(newPlayer.ply2.arm, "N/A") == 0 ? "-" : newPlayer.ply2.arm,
                    strcmp(newPlayer.btype, "N/A") == 0 ? "-" : newPlayer.btype,
                    strcmp(newPlayer.handed, "N/A") == 0 ? "-" : newPlayer.handed);
@@ -141,8 +147,11 @@ void updatePlayers()
         perror("Can not open file! ");
         return;
     }
+    // started a temporary array to  store the read data.
     struct bat players[100];
     int count = 0;
+
+    // setting the file pointer to skip the header line.
     fseek(fp, 56, SEEK_SET);
     while (!feof(fp))
     {
@@ -155,6 +164,7 @@ void updatePlayers()
         }
     }
     fclose(fp);
+    // checking if the player name with the input exsts.
     for (int i = 0; i < count; i++)
     {
         printf("Player Found: %s, %s, %s, %s, %s, %s\n", players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
