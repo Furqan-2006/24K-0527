@@ -153,6 +153,7 @@ void updatePlayers()
 
     // setting the file pointer to skip the header line.
     fseek(fp, 56, SEEK_SET);
+    
     while (!feof(fp))
     {
         if (fscanf(fp, "%19[^,],%19[^,],%9[^,],%4[^,],%9[^,],%7[^\n]\n",
@@ -167,8 +168,7 @@ void updatePlayers()
     // checking if the player name with the input exsts.
     for (int i = 0; i < count; i++)
     {
-        printf("Player Found: %s, %s, %s, %s, %s, %s\n", players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type,
-               players[i].ply2.arm, players[i].btype, players[i].handed);
+        printf("Player Found: %s, %s, %s, %s, %s, %s\n", players[i].ply2.ply.name, players[i].ply2.ply.team, players[i].ply2.type, players[i].ply2.arm, players[i].btype, players[i].handed);
     }
 
     char Pname[20];
