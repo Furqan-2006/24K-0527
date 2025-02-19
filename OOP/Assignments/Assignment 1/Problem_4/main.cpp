@@ -16,8 +16,8 @@ private:
     int attendance;
 
 public:
-    Student(string id, string n, string stop)
-        : studentID(id), studentName(n), balance(0), stopID(stop), isActive(false) {};
+    Student(string id = "", string n = "", string stop = "")
+        : studentID(id), studentName(n), balance(0), stopID(stop), isActive(false), attendance(0) {};
 
     void payTransportFee(double fees)
     {
@@ -50,24 +50,45 @@ class BusStop
 private:
     string stopID;
     string location;
-    vector<Student> studentsAtStop;
+    Student *studentsAtStop;
+    int studentCount;
+    int capacity;
 
 public:
-    BusStop(string id, string loc)
-        : stopID(id), location(loc) {};
+    BusStop(string id = "", string loc = "")
+        : stopID(id), location(loc), studentCount(0), capacity(0)
+    {
+        studentsAtStop = new Student[capacity];
+    };
+
+    ~BusStop()
+    {
+        delete[] studentsAtStop;
+    }
 
     void assignStudent(Student s)
     {
-        studentsAtStop.push_back(s);
+        if (studentCount == capacity)
+        {
+            capacity *= 2;
+            Student *newStudents = new Student[capacity];
+            for (int i = 0; i < studentCount; i++)
+            {
+                newStudents[i] = studentsAtStop[i];
+            }
+            delete[] studentsAtStop;
+            studentsAtStop = newStudents;
+        }
+        studentsAtStop[studentCount++] = s;
     }
     void getStopDetails()
     {
         cout << "Stop ID: " << stopID << endl
              << "Location: " << location << endl
              << "Student assigned to the stop: " << endl;
-        for (auto &s : studentsAtStop)
+        for (int i = 0; i < studentCount; i++)
         {
-            cout << "* " << s.getName() << endl;
+            cout << "* " << studentsAtStop[i].getName() << endl;
         }
     }
 
@@ -85,25 +106,38 @@ class Route
 {
 private:
     int routeNum;
-    vector<BusStop> busStops;
+    BusStop *busStops;
+    int stopCount;
+    int capacity;
 
 public:
-    Route(int routeNum)
+    Route(int num = 1) : routeNum(num), stopCount(0), capacity(10)
     {
-        this->routeNum = routeNum;
+        busStops = new BusStop[capacity];
     }
+
     void addBusStop(BusStop bs)
     {
-        busStops.push_back(bs);
+        if (stopCount == capacity)
+        {
+            capacity *= 2;
+            BusStop *newStops = new BusStop[capacity];
+            for (int i = 0; i < stopCount; i++)
+            {
+                newStops[i] = busStops[i];
+            }
+            delete[] busStops;
+            busStops[stopCount++] = bs;
+        }
     };
     void getRouteDetails()
     {
         cout << "Route #: " << routeNum << endl
              << "Bus Stops on Route# " << routeNum << endl;
         int i = 1;
-        for (auto &bs : busStops)
+        for (int i = 0; i < stopCount; i++)
         {
-            cout << i << ". Stop ID: " << bs.getStopID() << ", Stop location: " << bs.getStopLocation() << endl;
+            cout << i << ". Stop ID: " << busStops[i].getStopID() << ", Stop location: " << busStops[i].getStopLocation() << endl;
             i++;
         }
     }
@@ -116,8 +150,8 @@ private:
     Route assignedRoute;
 
 public:
+    Bus() {};
     Bus(string id, Route r) : busID(id), assignedRoute(r) {};
-
     void assignRoute(Route r)
     {
         assignedRoute = r;
@@ -126,22 +160,77 @@ public:
 class TransportationSystem
 {
 private:
-    vector<Student> students;
-    vector<Route> routes;
-    vector<Bus> buses;
+    Student *students;
+    int studentCount;
+    int studentCapacity;
+
+    Route *routes;
+    int routeCount;
+    int routeCapacity;
+
+    Bus *buses;
+    int busCount;
+    int busCapacity;
 
 public:
+    TransportationSystem()
+        : studentCount(0), routeCount(0), busCount(0),
+          studentCapacity(10), routeCapacity(10), busCapacity(10)
+    {
+        students = new Student[studentCapacity];
+        routes = new Route[routeCapacity];
+        buses = new Bus[busCapacity];
+    };
+
+    ~TransportationSystem()
+    {
+        delete[] students;
+        delete[] routes;
+        delete[] buses;
+    }
     void registerStudent(Student s)
     {
-        students.push_back(s);
+        if (studentCount == studentCapacity)
+        {
+            studentCapacity *= 2;
+            Student *newStudents = new Student[studentCapacity];
+            for (int i = 0; i < studentCount; i++)
+            {
+                newStudents[i] = students[i];
+            }
+            delete[] students;
+            students = newStudents;
+        }
+        students[studentCount++] = s;
     }
     void addRoute(Route r)
     {
-        routes.push_back(r);
+        if (routeCount == routeCapacity)
+        {
+            routeCapacity *= 2;
+            Route *newRoutes = new Route[routeCapacity];
+            for (int i = 0; i < routeCount; i++)
+            {
+                newRoutes[i] = routes[i];
+            }
+            delete[] routes;
+            routes = newRoutes;
+        }
+        routes[routeCount++] = r;
     }
     void addBuses(Bus b)
     {
-        buses.push_back(b);
+        if (busCount == busCapacity)
+        {
+            Bus *newBuses = new Bus[busCapacity];
+            for (int i = 0; i < busCount; i++)
+            {
+                newBuses[i] = buses[i];
+            }
+            delete[] buses;
+            buses = newBuses;
+        }
+        buses[busCount++] = b;
     }
     void assignStudentsToStops(Student s, BusStop &bs)
     {
