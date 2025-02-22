@@ -4,6 +4,10 @@
 
 using namespace std;
 
+random_device rd;                         // Seed for the random number engine
+mt19937 gen(rd());                        // Mersenne Twister engine for better randomness
+uniform_int_distribution<int> dist(0, 1); // Random number in range [0, 1]
+
 class Robot
 {
     string name;
@@ -12,31 +16,20 @@ class Robot
 public:
     Robot(string n) : name(n), hits(0) {};
 
-    void hitBall(int &dx, int &dy, const string &direction)
+    void hitBall(int &ballX, int &ballY, const string &direction)
     {
         hits++;
 
         if (direction == "up")
-        {
-            dy = 1;
-            dx = 0;
-        }
+            ballY++;
         else if (direction == "down")
-        {
-            dy = -1;
-            dx = 0;
-        }
+            ballY--;
         else if (direction == "left")
-        {
-            dy = 0;
-            dx = -1;
-        }
+            ballX--;
         else if (direction == "right")
-        {
-            dy = 0;
-            dx = 1;
-        }
-    };
+            ballX++;
+    }
+
     int getHits()
     {
         return hits;
@@ -62,6 +55,11 @@ public:
     {
         x += dx;
         y += dy;
+        if (x >= 3)
+            x = 3;
+
+        if (y >= 3)
+            y = 3;
     };
 
     tuple<int, int> getPosition()
@@ -104,13 +102,27 @@ class Game
 public:
     Ball ball;
     Goal goal;
+    Team *teams[2];
 
-    Team teams[2];
-    Game(string team1Name, string player1Name, string team2Name, string player2Name, int ballX, int ballY, int goalX, int goalY) : teams{Team(team1Name, player1Name), Team(team2Name, player2Name)}, ball(ballX, ballY), goal(goalX, goalY) {};
+    Game(string team1Name, string player1Name, string team2Name, string player2Name, int ballX, int ballY, int goalX, int goalY) : ball(ballX, ballY), goal(goalX, goalY)
+    {
+        teams[0] = new Team(team1Name, player1Name);
+        teams[1] = new Team(team2Name, player2Name);
+    }
+    ~Game()
+    {
+        delete teams[0];
+        delete teams[1];
+    }
 
     void startGame()
     {
         cout << "GAME START!" << endl;
+        while (!goal.isGoalReachead(ball.getX(), ball.getY()))
+        {
+            int turn = dist(gen);
+            play(*teams[turn]);
+        }
     }
 
     void play(Team &team)
@@ -120,30 +132,35 @@ public:
         cin >> direction;
 
         Robot *player = team.getPlayer();
-        int dx = 0, dy = 0;
+        int ballX = ball.getX();
+        int ballY = ball.getY();
 
-        player->hitBall(dx, dy, direction); // Get movement changes
-        ball.move(dx, dy);                  // Move the ball
+        player->hitBall(ballX, ballY, direction);            // Get movement changes
+        ball.move(ballX - ball.getX(), ballY - ball.getY()); // Move the ball
 
         cout << team.getTeamName() << " moved ball to (" << ball.getX() << ", " << ball.getY() << ")." << endl;
     }
 
     void declareWinner()
     {
-        int hits1 = teams[0].getPlayer()->getHits();
-        int hits2 = teams[1].getPlayer()->getHits();
+        int hits1 = teams[0]->getPlayer()->getHits();
+        int hits2 = teams[1]->getPlayer()->getHits();
 
-        if (hits1 > hits2)
+        cout << "\nTeams Scores: " << endl;
+        cout << teams[0]->getTeamName() << ": " << hits1 << " hits" << endl;
+        cout << teams[1]->getTeamName() << ": " << hits2 << " hits\n" << endl;
+
+        if (hits1 < hits2)
         {
-            cout << teams[0].getTeamName() << " wins!" << endl;
+            cout << teams[0]->getTeamName() << " wins!" << endl;
         }
-        else if (hits1 < hits2)
+        else if (hits1 > hits2)
         {
-            cout << teams[1].getTeamName() << " wins!" << endl;
+            cout << teams[1]->getTeamName() << " wins!" << endl;
         }
         else
         {
-            cout << " Draw! " << endl;
+            cout << "Game Draw! " << endl;
         }
     }
 };
@@ -153,10 +170,6 @@ int main()
     string team2Name;
     string player1Name;
     string player2Name;
-
-    random_device rd;                         // Seed for the random number engine
-    mt19937 gen(rd());                        // Mersenne Twister engine for better randomness
-    uniform_int_distribution<int> dist(0, 1); // Random number in range [0, 1]
 
     cout << "Enter the following detail: " << endl;
     cout << "Enter team 1 name: ";
@@ -171,11 +184,6 @@ int main()
     Game game(team1Name, player1Name, team2Name, player2Name, 0, 0, 3, 3);
 
     game.startGame();
-    while (!game.goal.isGoalReachead(game.ball.getX(), game.ball.getY()))
-    {
-        int turn = dist(gen);
-        game.play(game.teams[turn]);
-    }
     game.declareWinner();
 
     return 0;
