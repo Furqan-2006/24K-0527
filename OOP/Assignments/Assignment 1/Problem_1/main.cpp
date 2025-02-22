@@ -1,16 +1,164 @@
-// *-*-*-*-*-*  MENTORSHIP SYSTEM  *-*-*-*-*-*
-
-// !! To run these problem type the following in the termoinal or command prompt
-// ** g++ main.cpp mentor.cpp student.cpp -o mentorSystem
-// ** ./mentorSystem
-
-//?? MAKE SURE TO OPEN "CMD" IN SAME DIRECTORY AS THE PROGRAM FILES
-
-#include "mentor.hpp"
-#include "student.hpp"
-
+#include <iostream>
 using namespace std;
 
+class Mentor;
+
+class Student
+{
+private:
+    string studentID;
+    string studentName;
+    int age;
+    string *sportInterest;
+    int interestCount;
+    int maxInterests;
+
+public:
+    Mentor *mentorAssigned;
+
+    Student(string id, string n, int a)
+        : studentID(id), studentName(n), age(a), interestCount(0), maxInterests(5), mentorAssigned(nullptr)
+    {
+        sportInterest = new string[maxInterests];
+    }
+
+    ~Student()
+    {
+        delete[] sportInterest;
+    }
+    string getStudentName() { return studentName; }
+    string getStudentID() { return studentID; }
+    int getAge() { return age; }
+
+    void registerForMentorship(Mentor *m);
+
+    void viewMentorDetails();
+
+    void updateSportsInterest(string sports)
+    {
+        if (interestCount < 5)
+        {
+            sportInterest[interestCount++] = sports;
+        }
+        else
+        {
+            cout << "Cannot add more interests. Limit reached!" << endl
+                 << "Please focus on the ones you have already." << endl;
+        }
+    }
+    void showStudentDetails()
+    {
+        cout << "Student ID: " << studentID << "\nName: " << studentName
+             << "\nAge: " << age << "Sports Interests: \n";
+        for (int i = 0; i < interestCount; i++)
+        {
+            cout << "- " << sportInterest[i] << "\n";
+        }
+    }
+};
+
+class Mentor
+{
+private:
+    string mentorID;
+    string mentorName;
+    int maxLearners;
+    string sportExpertise[5];
+    int expertiseCount;
+    Student **assignedLearners;
+
+    int learnerCount;
+
+public:
+    Mentor(string id, string n, int maxL)
+        : mentorID(id), mentorName(n), maxLearners(maxL), expertiseCount(0), learnerCount(0)
+    {
+        assignedLearners = new Student *[maxLearners];
+    }
+
+    ~Mentor()
+    {
+        delete[] assignedLearners;
+    }
+
+    string getMentorName() { return mentorName; }
+    string getMentorID() { return mentorID; }
+
+    void addExpertise(string expertise)
+    {
+        if (expertiseCount < 5)
+        {
+            sportExpertise[expertiseCount++] = expertise;
+        }
+        else
+        {
+            cout << "Limit Reached for this program! Cannot add more. Sorry!" << endl;
+        }
+    }
+    void assignLearner(Student *s)
+    {
+
+        if (learnerCount < maxLearners)
+        {
+            assignedLearners[learnerCount++] = s;
+            s->registerForMentorship(this);
+            cout << "Registered Successfully!" << endl;
+        }
+        else
+        {
+            cout << "Cannot assign more learner as limit has reached." << endl;
+        }
+    }
+    void removeLearner(Student *s)
+    {
+        for (int i = 0; i < learnerCount; i++)
+        {
+            if (assignedLearners[i] == s)
+            {
+                for (int j = i; j < learnerCount - 1; j++)
+                {
+                    assignedLearners[j] = assignedLearners[j + 1];
+                }
+                learnerCount--;
+                s->registerForMentorship(nullptr);
+                cout << "Learner removed Successfully!" << endl;
+                return;
+            }
+        }
+        cout << "Learner Not Found!" << endl;
+    }
+    void viewLearners()
+    {
+        cout << "Assigned Learners: " << endl;
+        for (int i = 0; i < learnerCount; i++)
+        {
+            cout << "- " << assignedLearners[i]->getStudentName() << endl;
+        }
+    }
+    void provideGuidance(string guidance)
+    {
+        cout << mentorName << " is providing guidance to students." << endl;
+        cout << guidance << endl;
+    };
+};
+
+void Student::registerForMentorship(Mentor *m)
+{
+    mentorAssigned = m;
+    cout << studentName << " has been assigned to the mentor " << m->getMentorName() << endl;
+}
+void Student::viewMentorDetails()
+{
+    if (mentorAssigned)
+    {
+        cout << "Mentor Name: " << mentorAssigned->getMentorName() << endl
+             << "Mentor ID: " << mentorAssigned->getMentorID() << endl;
+    }
+    else
+    {
+        cout << "No mentor assigned!" << endl;
+    }
+}
 class Skill
 {
 private:
@@ -20,7 +168,7 @@ private:
 public:
     string skillDescription;
 
-    Skill(string id, string n) : skillID(id), skillName(n) {}
+    Skill(string id = "", string n = " ") : skillID(id), skillName(n) {}
 
     string getSkillName() { return skillName; }
     string getSkillID() { return skillID; }
@@ -46,73 +194,104 @@ private:
 
 public:
     string description;
-    vector<Skill *> skillRequired;
+    Skill skillRequired[10];
+    int skillCount;
 
-    Sport(string id, string n) : sportsID(id), sportsName(n) {}
+    Sport(string id = "", string n = "") : sportsID(id), sportsName(n), skillCount(0) {}
 
     string getSportName() { return sportsName; }
     string getSportID() { return sportsID; }
 
     void addSkill(Skill &s)
     {
-        skillRequired.push_back(&s);
-        cout << s.getSkillName() << " is added to the sport " << getSportName() << endl;
+        if (skillCount < 10)
+        {
+            skillRequired[skillCount++] = s;
+            cout << s.getSkillName() << " is added to the sport " << getSportName() << endl;
+        }
+        else
+        {
+            cout << "Cannot add any skill. Limit reached." << endl;
+        }
     }
 
-    void removeSkill(Skill &s)
+    void removeSkill(string skillID)
     {
-        auto it = remove(skillRequired.begin(), skillRequired.end(), &s);
-        if (it != skillRequired.end())
+        for (int i = 0; i < skillCount; i++)
         {
-            skillRequired.erase(it);
-            cout << s.getSkillName() << " removed from " << getSportName() << endl;
+            if (skillRequired[i].getSkillID() == skillID)
+            {
+                for (int j = i; j < skillCount - 1; j++)
+                {
+                    skillRequired[j] = skillRequired[j + 1];
+                }
+                skillCount--;
+                cout << "Skill removed Successfully!" << endl;
+                return;
+            }
+        }
+        cout << "Skill Not Found!" << endl;
+    }
+    void showSportDetails()
+    {
+        cout << "Sport ID: " << sportsID << endl
+             << "Sport Name: " << sportsName << endl
+             << "Description: " << description << endl
+             << "Skills Required: " << endl;
+        for (int i = 0; i < skillCount; i++)
+        {
+            cout << "- " << skillRequired[i].getSkillName() << endl;
         }
     }
 };
-
 int main()
 {
 
-    Mentor mentor1("M-1", "Coach Alex", 3);
-    Mentor mentor2("M-2", "Aslam Saleem", 2);
+    Student student1("S001", "Saad", 20);
+    Student student2("S002", "Ali", 21);
+    Student student3("S003", "Ahmed", 22);
 
-    Student student1("S-1", "Ahmed Ali", 19);
-    Student student2("S-2", "Abu Bakr", 18);
-    Student student3("S-3", "Furqan", 18);
+    Mentor mentor("M001", "Ali", 3);
 
-    Sport sport1("sp-1", "Football");
-    Sport sport2("sp-2", "Baseball");
+    mentor.addExpertise("Tennis");
+    mentor.addExpertise("Football");
 
-    Skill skill1("sk-1", "dribbling");
-    Skill skill2("sk-2", "shooting");
-    Skill skill3("sk-3", "block");
-    Skill skill4("sk-4", "The Nutmeg");
-    Skill skill5("sk-5", "Body Control");
+    student1.updateSportsInterest(string("Tennis"));
+    student2.updateSportsInterest(string("Tennis"));
+    student3.updateSportsInterest(string("Football"));
 
-    student1.updateSportsInterest("Football");
-    student2.updateSportsInterest("Baseball");
-    student3.updateSportsInterest("Football");
+    mentor.assignLearner(&student1);
+    mentor.assignLearner(&student2);
+    mentor.assignLearner(&student3);
 
-    // Assigning values
-
-    mentor1.sportExpertise.push_back("Baseball");
-    mentor2.sportExpertise.push_back("Football");
-
-    mentor1.assignLearner(student2);
-    mentor2.assignLearner(student1);
-    mentor2.assignLearner(student3);
-
-    mentor1.viewLearners();
-    mentor2.viewLearners();
-
-    mentor1.provideGuidance("Practice daily and focus on technique!");
-    mentor2.provideGuidance("Practice daily and focus on technique!");
+    Student student4("S004", "Bilal", 19);
+    student4.updateSportsInterest("Tennis");
+    mentor.assignLearner(&student4);
 
     student1.viewMentorDetails();
-    student2.viewMentorDetails();
-    student3.viewMentorDetails();
 
-    mentor2.removeLearner(student1);
-    mentor2.viewLearners();
+    mentor.viewLearners();
+
+    mentor.provideGuidance("Focus on your footwork and serve technique in Tennis.");
+
+    mentor.removeLearner(&student2);
+
+    mentor.viewLearners();
+
+    mentor.assignLearner(&student4);
+
+    mentor.viewLearners();
+
+    Sport tennis("T001", "Tennis");
+    tennis.description = "A racket sport that can be played individually or in pairs.";
+    Skill serve("SK001", "Serve");
+    serve.skillDescription = "The act of putting the ball into play.";
+    tennis.addSkill(serve);
+
+    tennis.showSportDetails();
+
+    serve.updateSkillDescription("The serve is the shot that starts a point in tennis.");
+    serve.showSkillDetails();
+
     return 0;
 }
