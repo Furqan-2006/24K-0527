@@ -56,7 +56,7 @@ private:
 
 public:
     BusStop(string id = "", string loc = "")
-        : stopID(id), location(loc), studentCount(0), capacity(0)
+        : stopID(id), location(loc), studentCount(0), capacity(10)
     {
         studentsAtStop = new Student[capacity];
     };
@@ -127,8 +127,9 @@ public:
                 newStops[i] = busStops[i];
             }
             delete[] busStops;
-            busStops[stopCount++] = bs;
+            busStops = newStops;
         }
+        busStops[stopCount++] = bs;
     };
     void getRouteDetails()
     {
@@ -152,11 +153,17 @@ private:
 public:
     Bus() {};
     Bus(string id, Route r) : busID(id), assignedRoute(r) {};
+
     void assignRoute(Route r)
     {
         assignedRoute = r;
     }
+    void changeRoute(Route r)
+    {
+        assignedRoute = r;
+    }
 };
+
 class TransportationSystem
 {
 private:
@@ -222,6 +229,7 @@ public:
     {
         if (busCount == busCapacity)
         {
+            busCapacity *= 2;
             Bus *newBuses = new Bus[busCapacity];
             for (int i = 0; i < busCount; i++)
             {
