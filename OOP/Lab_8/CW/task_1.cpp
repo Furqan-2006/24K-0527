@@ -104,7 +104,10 @@ int main()
 {
     Fraction f1, f2;
     cout << "Enter two fractions (format: a/b): ";
-    cin >> f1 >> f2;
+    cout << "Fraction 1: ";
+    cin >> f1;
+    cout << "Fraction 2: ";
+    cin >> f2;
 
     Fraction sum = f1 + f2;
     cout << "Sum: " << sum << endl;
@@ -120,7 +123,7 @@ int main()
 
     bool comp1 = f1 < f2;
     cout << "Lesser Fraction: " << (comp1 ? f1 : f2) << endl;
-    
+
     bool comp2 = f1 > f2;
     cout << "Greater Fraction: " << (comp2 ? f1 : f2) << endl;
 
