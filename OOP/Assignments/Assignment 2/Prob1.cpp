@@ -1,7 +1,8 @@
 #include <iostream>
 using namespace std;
 
-class Person {
+class Person
+{
 protected:
     string ID;
     string name;
@@ -12,95 +13,123 @@ public:
     Person(string id = "", string n = "") : ID(id), name(n), balance(0), hasPaid(false) {}
 
     virtual void payTransportFee(double amount) = 0;
-    virtual void tapCard() {
+    virtual void tapCard()
+    {
         cout << (hasPaid ? "Attendance Marked for: " + name : "Access Denied!") << endl;
     }
     string getName() { return name; }
     string getID() { return ID; }
     double getBalance() { return balance; } // Added for completeness
 
-    void operator+=(double amount) {
-        if (amount >= 0) balance += amount; // Prevent negative amounts
+    void operator+=(double amount)
+    {
+        if (amount >= 0)
+            balance += amount; // Prevent negative amounts
     }
 };
 
-class Student : public Person {
+class Student : public Person
+{
     string stopID;
     int attendance;
 
 public:
-    Student(string id = "", string n = "", string sid = "") 
+    Student(string id = "", string n = "", string sid = "")
         : Person(id, n), stopID(sid), attendance(0) {}
 
-    void payTransportFee(double amount) override {
-        if (amount < 0) {
+    void payTransportFee(double amount) override
+    {
+        if (amount < 0)
+        {
             cout << "Invalid amount!" << endl;
             return;
         }
         *this += amount;
         cout << "Amount Deposited: " << amount << "\nCurrent Balance: " << balance << endl;
-        if (balance >= 45000) {
+        if (balance >= 45000)
+        {
             hasPaid = true;
             cout << "Fees paid! Student has activated their transport card." << endl;
-        } else {
+        }
+        else
+        {
             cout << "Pay full fees (45000) to activate transport access." << endl;
         }
     }
-    void tapCard() override {
-        if (hasPaid) {
+    void tapCard() override
+    {
+        if (hasPaid)
+        {
             cout << "Attendance Recorded for " << name << "!" << endl;
             attendance++;
-        } else {
+        }
+        else
+        {
             cout << "YOU ARE NOT ALLOWED! PAY FEES TO GET ACCESS!" << endl;
         }
     }
 };
 
-class Teacher : public Person {
+class Teacher : public Person
+{
 public:
     Teacher(string id = "", string n = "") : Person(id, n) {}
-    void payTransportFee(double amount) override {
-        if (amount < 0) {
+    void payTransportFee(double amount) override
+    {
+        if (amount < 0)
+        {
             cout << "Invalid amount!" << endl;
             return;
         }
         *this += amount;
         cout << "Amount Deposited: " << amount << "\nCurrent Balance: " << balance << endl;
-        if (balance >= 5000) {
+        if (balance >= 5000)
+        {
             hasPaid = true;
             cout << "Fees paid! Teacher has activated their transport card." << endl;
-        } else {
+        }
+        else
+        {
             cout << "Pay full fees (5000) to activate transport access." << endl;
         }
     }
-    void tapCard() override {
+    void tapCard() override
+    {
         cout << (hasPaid ? "Teacher attendance marked." : "Access Denied! Pay Fees.") << endl;
     }
 };
 
-class Staff : public Person {
+class Staff : public Person
+{
 public:
     Staff(string id = "", string n = "") : Person(id, n) {}
-    void payTransportFee(double amount) override {
-        if (amount < 0) {
+    void payTransportFee(double amount) override
+    {
+        if (amount < 0)
+        {
             cout << "Invalid amount!" << endl;
             return;
         }
         *this += amount;
         cout << "Amount Deposited: " << amount << "\nCurrent Balance: " << balance << endl;
-        if (balance >= 3500) {
+        if (balance >= 3500)
+        {
             hasPaid = true;
             cout << "Fees paid! Staff member has activated their transport card." << endl;
-        } else {
+        }
+        else
+        {
             cout << "Pay full fees (3500) to activate transport access." << endl;
         }
     }
-    void tapCard() override {
+    void tapCard() override
+    {
         cout << (hasPaid ? "Staff attendance marked." : "Access Denied! Pay Fees.") << endl;
     }
 };
 
-class BusStop {
+class BusStop
+{
 private:
     string stopID;
     string location;
@@ -110,19 +139,24 @@ private:
 
 public:
     BusStop(string id = "", string loc = "")
-        : stopID(id), location(loc), peopleCount(0), capacity(10) {
+        : stopID(id), location(loc), peopleCount(0), capacity(10)
+    {
         peopleAtStop = new Person *[capacity];
     }
 
-    ~BusStop() {
+    ~BusStop()
+    {
         delete[] peopleAtStop; // Only delete the array, not individual pointers
     }
 
-    void assignPerson(Person *p) {
-        if (peopleCount == capacity) {
+    void assignPerson(Person *p)
+    {
+        if (peopleCount == capacity)
+        {
             capacity *= 2;
             Person **newPeople = new Person *[capacity];
-            for (int i = 0; i < peopleCount; i++) {
+            for (int i = 0; i < peopleCount; i++)
+            {
                 newPeople[i] = peopleAtStop[i];
             }
             delete[] peopleAtStop;
@@ -130,11 +164,13 @@ public:
         }
         peopleAtStop[peopleCount++] = p;
     }
-    void getStopDetails() {
+    void getStopDetails()
+    {
         cout << "Stop ID: " << stopID << endl
              << "Location: " << location << endl
              << "People assigned to the stop: " << endl;
-        for (int i = 0; i < peopleCount; i++) {
+        for (int i = 0; i < peopleCount; i++)
+        {
             cout << "* " << peopleAtStop[i]->getName() << endl;
         }
     }
@@ -142,7 +178,8 @@ public:
     string getStopLocation() { return location; }
 };
 
-class Route {
+class Route
+{
 private:
     int routeNum;
     BusStop *busStops;
@@ -150,20 +187,26 @@ private:
     int capacity;
 
 public:
-    Route() : routeNum(0), stopCount(0), capacity(10) {
+    Route() : routeNum(0), stopCount(0), capacity(10)
+    {
         busStops = new BusStop[capacity];
     }
-    Route(int num) : routeNum(num), stopCount(0), capacity(10) {
+    Route(int num) : routeNum(num), stopCount(0), capacity(10)
+    {
         busStops = new BusStop[capacity];
     }
-    ~Route() {
+    ~Route()
+    {
         delete[] busStops;
     }
-    void addBusStop(BusStop bs) {
-        if (stopCount == capacity) {
+    void addBusStop(BusStop bs)
+    {
+        if (stopCount == capacity)
+        {
             capacity *= 2;
             BusStop *newStops = new BusStop[capacity];
-            for (int i = 0; i < stopCount; i++) {
+            for (int i = 0; i < stopCount; i++)
+            {
                 newStops[i] = busStops[i];
             }
             delete[] busStops;
@@ -171,26 +214,33 @@ public:
         }
         busStops[stopCount++] = bs;
     }
-    bool operator==(const Route &other) const {
-        if (stopCount != other.stopCount) return false;
-        for (int i = 0; i < stopCount; i++) {
-            if (busStops[i].getStopID() != other.busStops[i].getStopID()) {
+    bool operator==(const Route &other) const
+    {
+        if (stopCount != other.stopCount)
+            return false;
+        for (int i = 0; i < stopCount; i++)
+        {
+            if (busStops[i].getStopID() != other.busStops[i].getStopID())
+            {
                 return false;
             }
         }
         return true;
     }
-    void getRouteDetails() {
+    void getRouteDetails()
+    {
         cout << "Route #: " << routeNum << endl
              << "Bus Stops on Route# " << routeNum << endl;
-        for (int i = 0; i < stopCount; i++) {
-            cout << i << ". Stop ID: " << busStops[i].getStopID() 
+        for (int i = 0; i < stopCount; i++)
+        {
+            cout << i << ". Stop ID: " << busStops[i].getStopID()
                  << ", Stop location: " << busStops[i].getStopLocation() << endl;
         }
     }
 };
 
-class Bus {
+class Bus
+{
 private:
     string busID;
     Route *assignedRoute;
@@ -202,7 +252,8 @@ public:
     void changeRoute(Route *r) { assignedRoute = r; }
 };
 
-class TransportationSystem {
+class TransportationSystem
+{
 private:
     Person **peoples;
     int peopleCount;
@@ -217,23 +268,28 @@ private:
 public:
     TransportationSystem()
         : peopleCount(0), routeCount(0), busCount(0),
-          peopleCapacity(10), routeCapacity(10), busCapacity(10) {
+          peopleCapacity(10), routeCapacity(10), busCapacity(10)
+    {
         peoples = new Person *[peopleCapacity];
         routes = new Route[routeCapacity];
         buses = new Bus[busCapacity];
     }
 
-    ~TransportationSystem() {
+    ~TransportationSystem()
+    {
         delete[] peoples; // Only delete array, objects managed elsewhere
         delete[] routes;
         delete[] buses;
     }
 
-    void registerPeople(Person *s) {
-        if (peopleCount == peopleCapacity) {
+    void registerPeople(Person *s)
+    {
+        if (peopleCount == peopleCapacity)
+        {
             peopleCapacity *= 2;
             Person **newPeoples = new Person *[peopleCapacity];
-            for (int i = 0; i < peopleCount; i++) {
+            for (int i = 0; i < peopleCount; i++)
+            {
                 newPeoples[i] = peoples[i];
             }
             delete[] peoples;
@@ -241,11 +297,14 @@ public:
         }
         peoples[peopleCount++] = s;
     }
-    void addRoute(Route r) {
-        if (routeCount == routeCapacity) {
+    void addRoute(Route r)
+    {
+        if (routeCount == routeCapacity)
+        {
             routeCapacity *= 2;
             Route *newRoutes = new Route[routeCapacity];
-            for (int i = 0; i < routeCount; i++) {
+            for (int i = 0; i < routeCount; i++)
+            {
                 newRoutes[i] = routes[i];
             }
             delete[] routes;
@@ -253,11 +312,14 @@ public:
         }
         routes[routeCount++] = r;
     }
-    void addBuses(Bus b) {
-        if (busCount == busCapacity) {
+    void addBuses(Bus b)
+    {
+        if (busCount == busCapacity)
+        {
             busCapacity *= 2;
             Bus *newBuses = new Bus[busCapacity];
-            for (int i = 0; i < busCount; i++) {
+            for (int i = 0; i < busCount; i++)
+            {
                 newBuses[i] = buses[i];
             }
             delete[] buses;
@@ -265,15 +327,18 @@ public:
         }
         buses[busCount++] = b;
     }
-    void assignPersonsToStops(Person *s, BusStop &bs) {
+    void assignPersonsToStops(Person *s, BusStop &bs)
+    {
         bs.assignPerson(s);
     }
-    void recordAttendance(Person &p) {
+    void recordAttendance(Person &p)
+    {
         p.tapCard();
     }
 };
 
-int main() {
+int main()
+{
     // Creating People
     Student s1("S101", "Alice", "BS1");
     Student s2("S102", "Bob", "BS2");
